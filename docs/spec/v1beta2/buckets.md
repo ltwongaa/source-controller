@@ -756,15 +756,34 @@ configuration. A Security Token Service (STS) is a web service that issues
 temporary security credentials. By adding this field, one may specify the
 STS endpoint from where temporary credentials will be fetched.
 
+This field is only supported for the `aws` and `generic` bucket [providers](#provider).
+
 If using `.spec.sts`, the following fields are required:
 
 - `.spec.sts.provider`, the Security Token Service provider. The only supported
-  option is `aws`.
+  option for the `generic` bucket provider is `ldap`. The only supported option
+  for the `aws` bucket provider is `aws`.
 - `.spec.sts.endpoint`, the HTTP/S endpoint of the Security Token Service. In
-  the case of AWS, this can be `https://sts.amazonaws.com`, or a Regional STS
-  Endpoint, or an Interface Endpoint created inside a VPC.
+  the case of `aws` this can be `https://sts.amazonaws.com`, or a Regional STS
+  Endpoint, or an Interface Endpoint created inside a VPC. In the case of
+  `ldap` this must be the LDAP server endpoint.
 
-This field is only supported for the `aws` bucket provider.
+When using the `ldap` provider, the following fields may also be specified:
+
+- `.spec.sts.secretRef.name`, the name of the Secret containing the LDAP
+  credentials. The Secret must contain the following keys:
+  - `username`, the username to authenticate with.
+  - `password`, the password to authenticate with.
+- `.spec.sts.certSecretRef.name`, the name of the Secret containing the
+  TLS configuration for communicating with the STS endpoint. The contents
+  of this Secret must follow the same structure of
+  [`.spec.certSecretRef.name`](#cert-secret-reference).
+
+If [`.spec.proxySecretRef.name`](#proxy-secret-reference) is specified,
+the proxy configuration will be used for the following STS providers:
+
+* `aws`
+* `ldap`
 
 ### Bucket name
 
